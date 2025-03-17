@@ -1,7 +1,7 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { apiRequest } from "./queryClient";
+import { apiRequest, queryClient } from "./queryClient";
 
 const firebaseConfig = {
   apiKey: "AIzaSyASgrScK8oqNjPC5tquqdF3BRWm0pWX6fA",
@@ -58,6 +58,8 @@ export async function signInWithGoogle(): Promise<void> {
       throw new Error(`Backend authentication failed: ${error}`);
     }
 
+    // Invalidate and refetch user data after successful login
+    await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
     console.log("Backend authentication successful");
   } catch (error) {
     console.error("Error during Google sign-in:", error);
