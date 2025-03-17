@@ -48,7 +48,7 @@ export default function AuthPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-6 w-6 text-primary" />
-              SafeGuard Wearable
+              STREE
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -204,9 +204,9 @@ export default function AuthPage() {
 
       <div className="hidden lg:flex flex-1 bg-primary items-center justify-center p-12">
         <div className="max-w-lg text-primary-foreground">
-          <h1 className="text-4xl font-bold mb-6">Your Personal Safety Companion</h1>
+          <h1 className="text-4xl font-bold mb-6">STREE - Your Personal Safety Companion</h1>
           <p className="text-lg mb-4">
-            SafeGuard Wearable provides real-time monitoring and emergency response features
+            STREE provides real-time monitoring and emergency response features
             to keep you safe wherever you go.
           </p>
           <ul className="space-y-2">

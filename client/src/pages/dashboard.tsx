@@ -59,7 +59,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">SafeGuard Dashboard</h1>
+          <h1 className="text-2xl font-bold">STREE Dashboard</h1>
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -94,7 +94,7 @@ export default function Dashboard() {
               <VitalsMonitor deviceData={deviceData} />
             </div>
           </div>
-          
+
           <div className="space-y-6">
             <DeviceStatus data={deviceData} />
             <AlertPanel alert={latestAlert} alerts={alerts || []} />
