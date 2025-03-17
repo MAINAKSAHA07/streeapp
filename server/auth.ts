@@ -128,8 +128,14 @@ export function setupAuth(app: Express) {
     });
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+  app.post("/api/login", passport.authenticate("local", { failWithError: true }), (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
     res.status(200).json(req.user);
+  }, (err, req, res, next) => {
+    console.error("Login error:", err);
+    res.status(401).json({ message: "Authentication failed" });
   });
 
   app.post("/api/logout", (req, res, next) => {
