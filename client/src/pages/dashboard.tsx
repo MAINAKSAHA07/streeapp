@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "@/hooks/use-location";
 import { DeviceStatus } from "@/components/device-status";
 import { AlertPanel } from "@/components/alert-panel";
 import { LocationMap } from "@/components/location-map";
