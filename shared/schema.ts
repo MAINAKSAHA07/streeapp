@@ -46,6 +46,9 @@ export const deviceData = pgTable("device_data", {
   location: json("location").$type<{
     lat: number;
     lng: number;
+    accuracy?: number;
+    speed?: number;
+    heading?: number;
   }>(),
   isConnected: boolean("is_connected").notNull().default(true),
   shockEnabled: boolean("shock_enabled").notNull().default(false)
