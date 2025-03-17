@@ -2,8 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -19,14 +32,16 @@ export default function AuthPage() {
   const { toast } = useToast();
 
   const loginForm = useForm({
-    resolver: zodResolver(insertUserSchema.pick({ username: true, password: true }))
+    resolver: zodResolver(
+      insertUserSchema.pick({ username: true, password: true }),
+    ),
   });
 
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
-      emergencyContacts: []
-    }
+      emergencyContacts: [],
+    },
   });
 
   const handleGoogleSignIn = async () => {
@@ -35,7 +50,10 @@ export default function AuthPage() {
     } catch (error) {
       toast({
         title: "Google Sign-in failed",
-        description: error instanceof Error ? error.message : "Failed to sign in with Google",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to sign in with Google",
         variant: "destructive",
       });
     }
@@ -64,7 +82,12 @@ export default function AuthPage() {
 
               <TabsContent value="login">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit((data) => loginMutation.mutate(data))} className="space-y-4">
+                  <form
+                    onSubmit={loginForm.handleSubmit((data) =>
+                      loginMutation.mutate(data),
+                    )}
+                    className="space-y-4"
+                  >
                     <FormField
                       control={loginForm.control}
                       name="username"
@@ -91,8 +114,8 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full"
                       disabled={loginMutation.isPending}
                     >
@@ -103,7 +126,9 @@ export default function AuthPage() {
                         <span className="w-full border-t" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                        <span className="bg-background px-2 text-muted-foreground">
+                          Or continue with
+                        </span>
                       </div>
                     </div>
                     <Button
@@ -121,7 +146,12 @@ export default function AuthPage() {
 
               <TabsContent value="register">
                 <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit((data) => registerMutation.mutate(data))} className="space-y-4">
+                  <form
+                    onSubmit={registerForm.handleSubmit((data) =>
+                      registerMutation.mutate(data),
+                    )}
+                    className="space-y-4"
+                  >
                     <FormField
                       control={registerForm.control}
                       name="username"
@@ -161,7 +191,7 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    <FormField
+                    {/* <FormField
                       control={registerForm.control}
                       name="age"
                       render={({ field }) => (
@@ -173,14 +203,17 @@ export default function AuthPage() {
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
+                    /> */}
                     <FormField
                       control={registerForm.control}
                       name="gender"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Gender</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select gender" />
@@ -203,25 +236,32 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Medical Conditions (if any)</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="List any medical conditions" />
+                            <Input
+                              {...field}
+                              placeholder="List any medical conditions"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full"
                       disabled={registerMutation.isPending}
                     >
-                      {registerMutation.isPending ? "Creating Account..." : "Create Account"}
+                      {registerMutation.isPending
+                        ? "Creating Account..."
+                        : "Create Account"}
                     </Button>
                     <div className="relative">
                       <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                        <span className="bg-background px-2 text-muted-foreground">
+                          Or continue with
+                        </span>
                       </div>
                     </div>
                     <Button
@@ -243,7 +283,9 @@ export default function AuthPage() {
 
       <div className="hidden lg:flex flex-1 bg-primary items-center justify-center p-12">
         <div className="max-w-lg text-primary-foreground">
-          <h1 className="text-4xl font-bold mb-6">STREE - Your Personal Safety Companion</h1>
+          <h1 className="text-4xl font-bold mb-6">
+            STREE - Your Personal Safety Companion
+          </h1>
           <p className="text-lg mb-4">
             STREE provides real-time monitoring and emergency response features
             to keep you safe wherever you go.
