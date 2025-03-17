@@ -16,6 +16,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(data);
   });
 
+  app.post("/api/device-data/:userId/location", async (req, res) => {
+    const locationSchema = z.object({
+      lat: z.number(),
+      lng: z.number(),
+      accuracy: z.number().optional(),
+      speed: z.number().optional(),
+      heading: z.number().optional()
+    });
+
+    const location = locationSchema.parse(req.body);
+    const updatedData = await storage.updateDeviceLocation(parseInt(req.params.userId), location);
+    
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: "location_update", data: updatedData }));
+      }
+    });
+    
+    res.json(updatedData);
+  });
+
   app.get("/api/alerts/:userId", async (req, res) => {
     const alerts = await storage.getAlerts(parseInt(req.params.userId));
     res.json(alerts);

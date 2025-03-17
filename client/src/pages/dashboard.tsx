@@ -14,6 +14,17 @@ import { useToast } from "@/hooks/use-toast";
 export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
+  const { error: locationError } = useLocation();
+
+  useEffect(() => {
+    if (locationError) {
+      toast({
+        title: "Location Error",
+        description: locationError,
+        variant: "destructive"
+      });
+    }
+  }, [locationError, toast]);
   const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
   const [latestAlert, setLatestAlert] = useState<Alert | null>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);

@@ -21,7 +21,11 @@ export function LocationMap({ deviceData }: LocationMapProps) {
 
   useEffect(() => {
     if (!mapRef.current) {
-      mapRef.current = L.map("map").setView([0, 0], 13);
+      mapRef.current = L.map("map", {
+        zoomControl: true,
+        attributionControl: true
+      }).setView([0, 0], 13);
+      
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '© OpenStreetMap contributors'
       }).addTo(mapRef.current);
