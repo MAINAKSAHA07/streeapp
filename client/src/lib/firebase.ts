@@ -1,18 +1,28 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 import { apiRequest } from "./queryClient";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  messagingSenderId: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}` 
+  apiKey: "AIzaSyASgrScK8oqNjPC5tquqdF3BRWm0pWX6fA",
+  authDomain: "stree-f8587.firebaseapp.com",
+  projectId: "stree-f8587",
+  storageBucket: "stree-f8587.firebasestorage.app",
+  messagingSenderId: "799376222576",
+  appId: "1:799376222576:web:dac579d1635421f5e2c7b5",
+  measurementId: "G-VS6QPTZ9Q1"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+// Initialize Analytics (only in production environment)
+try {
+  getAnalytics(app);
+} catch (error) {
+  console.log("Analytics initialization skipped in development");
+}
 
 export async function signInWithGoogle(): Promise<void> {
   const provider = new GoogleAuthProvider();
