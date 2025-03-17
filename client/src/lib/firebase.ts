@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { apiRequest } from "./queryClient";
@@ -13,15 +13,24 @@ const firebaseConfig = {
   measurementId: "G-VS6QPTZ9Q1"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase (only once)
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+console.log("Firebase app initialized with config:", {
+  ...firebaseConfig,
+  apiKey: "****" // Hide API key in logs
+});
+
 export const auth = getAuth(app);
+console.log("Firebase auth initialized:", auth.currentUser);
 
 // Initialize Analytics (only in production environment)
 try {
-  getAnalytics(app);
+  if (typeof window !== 'undefined') {
+    getAnalytics(app);
+    console.log("Firebase Analytics initialized");
+  }
 } catch (error) {
-  console.log("Analytics initialization skipped in development");
+  console.log("Analytics initialization skipped:", error);
 }
 
 export async function signInWithGoogle(): Promise<void> {
@@ -53,7 +62,9 @@ export async function signInWithGoogle(): Promise<void> {
   } catch (error) {
     console.error("Error during Google sign-in:", error);
     if (error instanceof Error) {
-      if (error.message.includes('popup')) {
+      if (error.message.includes('auth/configuration-not-found')) {
+        throw new Error("Firebase is not properly configured. Please make sure Google sign-in is enabled in Firebase Console and the domain is authorized.");
+      } else if (error.message.includes('popup')) {
         throw new Error("Popup was blocked. Please allow popups for this site.");
       } else if (error.message.includes('network')) {
         throw new Error("Network error. Please check your connection.");
