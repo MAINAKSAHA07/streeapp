@@ -7,7 +7,9 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   fullName: text("full_name").notNull(),
-  medicalHistory: text("medical_history"),
+  age: integer("age"),
+  gender: text("gender"),
+  medicalConditions: text("medical_conditions"),
   emergencyContacts: json("emergency_contacts").$type<{
     name: string;
     phone: string;
@@ -19,7 +21,19 @@ export const users = pgTable("users", {
     lat: number;
     lng: number;
     radius: number;
-  }[]>().default([])
+  }[]>().default([]),
+  notificationSettings: json("notification_settings").$type<{
+    lowBattery: boolean;
+    disconnection: boolean;
+    highStress: boolean;
+    geofencing: boolean;
+  }>().default({
+    lowBattery: true,
+    disconnection: true,
+    highStress: true,
+    geofencing: true
+  }),
+  theme: text("theme").default("light")
 });
 
 export const deviceData = pgTable("device_data", {
@@ -54,7 +68,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   fullName: true,
-  medicalHistory: true
+  age: true,
+  gender: true,
+  medicalConditions: true,
+  emergencyContacts: true
 });
 
 export const insertDeviceDataSchema = createInsertSchema(deviceData);
