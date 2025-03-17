@@ -30,10 +30,14 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   };
 
   app.set("trust proxy", 1);
@@ -43,19 +47,68 @@ export function setupAuth(app: Express) {
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {
-      const user = await storage.getUserByUsername(username);
-      if (!user || !(await comparePasswords(password, user.password))) {
-        return done(null, false);
-      } else {
+      try {
+        const user = await storage.getUserByUsername(username);
+        if (!user || !(await comparePasswords(password, user.password))) {
+          return done(null, false);
+        }
         return done(null, user);
+      } catch (error) {
+        return done(error);
       }
     }),
   );
 
   passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser(async (id: number, done) => {
-    const user = await storage.getUser(id);
-    done(null, user);
+    try {
+      const user = await storage.getUser(id);
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
+  });
+
+  app.post("/api/google-auth", async (req, res, next) => {
+    try {
+      console.log("Received Google auth request:", req.body);
+      const { uid, email, displayName } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Check if user exists
+      let user = await storage.getUserByUsername(email);
+      console.log("Existing user:", user);
+
+      if (!user) {
+        console.log("Creating new user with Google info");
+        // Create new user with Google info
+        user = await storage.createUser({
+          username: email,
+          password: uid, // Use Firebase UID as password
+          fullName: displayName || email,
+          medicalHistory: null,
+          emergencyContacts: [],
+          safeZones: [],
+          stressThreshold: 80
+        });
+        console.log("New user created:", user);
+      }
+
+      // Log the user in
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Login error:", err);
+          return next(err);
+        }
+        res.status(200).json(user);
+      });
+    } catch (error) {
+      console.error("Google auth error:", error);
+      next(error);
+    }
   });
 
   app.post("/api/register", async (req, res, next) => {
@@ -89,31 +142,5 @@ export function setupAuth(app: Express) {
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
-  });
-
-  app.post("/api/google-auth", async (req, res, next) => {
-    try {
-      const { uid, email, displayName } = req.body;
-
-      // Check if user exists
-      let user = await storage.getUserByUsername(email);
-
-      if (!user) {
-        // Create new user with Google info
-        user = await storage.createUser({
-          username: email,
-          password: uid, // Use Firebase UID as password
-          fullName: displayName || email,
-        });
-      }
-
-      // Log the user in
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(200).json(user);
-      });
-    } catch (error) {
-      next(error);
-    }
   });
 }

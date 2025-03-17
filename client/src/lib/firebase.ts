@@ -31,17 +31,34 @@ export async function signInWithGoogle(): Promise<void> {
   });
 
   try {
+    console.log("Starting Google sign-in process...");
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    console.log("Google sign-in successful:", user.email);
 
     // Send the Firebase user info to our backend
-    await apiRequest("POST", "/api/google-auth", {
+    console.log("Sending user info to backend...");
+    const response = await apiRequest("POST", "/api/google-auth", {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
     });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Backend authentication failed: ${error}`);
+    }
+
+    console.log("Backend authentication successful");
   } catch (error) {
-    console.error("Error signing in with Google:", error);
+    console.error("Error during Google sign-in:", error);
+    if (error instanceof Error) {
+      if (error.message.includes('popup')) {
+        throw new Error("Popup was blocked. Please allow popups for this site.");
+      } else if (error.message.includes('network')) {
+        throw new Error("Network error. Please check your connection.");
+      }
+    }
     throw error;
   }
 }
