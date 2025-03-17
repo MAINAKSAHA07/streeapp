@@ -8,6 +8,7 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  messagingSenderId: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}` 
 };
 
 const app = initializeApp(firebaseConfig);
@@ -15,10 +16,14 @@ export const auth = getAuth(app);
 
 export async function signInWithGoogle(): Promise<void> {
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: 'select_account'
+  });
+
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    
+
     // Send the Firebase user info to our backend
     await apiRequest("POST", "/api/google-auth", {
       uid: user.uid,
