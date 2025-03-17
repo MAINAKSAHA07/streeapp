@@ -90,4 +90,30 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });
+
+  app.post("/api/google-auth", async (req, res, next) => {
+    try {
+      const { uid, email, displayName } = req.body;
+
+      // Check if user exists
+      let user = await storage.getUserByUsername(email);
+
+      if (!user) {
+        // Create new user with Google info
+        user = await storage.createUser({
+          username: email,
+          password: uid, // Use Firebase UID as password
+          fullName: displayName || email,
+        });
+      }
+
+      // Log the user in
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.status(200).json(user);
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 }

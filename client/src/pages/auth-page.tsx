@@ -9,10 +9,14 @@ import { useForm } from "react-hook-form";
 import { insertUserSchema } from "@shared/schema";
 import { Redirect } from "wouter";
 import { Shield } from "lucide-react";
+import { signInWithGoogle } from "@/lib/firebase";
+import { SiGoogle } from "react-icons/si";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
-  
+  const { toast } = useToast();
+
   const loginForm = useForm({
     resolver: zodResolver(insertUserSchema.pick({ username: true, password: true }))
   });
@@ -20,6 +24,18 @@ export default function AuthPage() {
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema)
   });
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      toast({
+        title: "Google Sign-in failed",
+        description: error instanceof Error ? error.message : "Failed to sign in with Google",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (user) {
     return <Redirect to="/" />;
@@ -41,7 +57,7 @@ export default function AuthPage() {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="login">
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit((data) => loginMutation.mutate(data))} className="space-y-4">
@@ -71,8 +87,29 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={loginMutation.isPending}
+                    >
                       {loginMutation.isPending ? "Logging in..." : "Login"}
+                    </Button>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleGoogleSignIn}
+                    >
+                      <SiGoogle className="mr-2 h-4 w-4" />
+                      Sign in with Google
                     </Button>
                   </form>
                 </Form>
@@ -133,8 +170,29 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={registerMutation.isPending}
+                    >
                       {registerMutation.isPending ? "Creating Account..." : "Create Account"}
+                    </Button>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleGoogleSignIn}
+                    >
+                      <SiGoogle className="mr-2 h-4 w-4" />
+                      Sign in with Google
                     </Button>
                   </form>
                 </Form>
@@ -143,7 +201,7 @@ export default function AuthPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="hidden lg:flex flex-1 bg-primary items-center justify-center p-12">
         <div className="max-w-lg text-primary-foreground">
           <h1 className="text-4xl font-bold mb-6">Your Personal Safety Companion</h1>
